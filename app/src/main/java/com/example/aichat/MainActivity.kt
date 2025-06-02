@@ -115,7 +115,7 @@ fun ChatScreen() {
 }
 
 @Composable
-fun ChatBubble(message: ChatMessage) {
+fun <ChatMessage> ChatBubble(message: ChatMessage) {
     val bubbleColor = if (message.isUser) MaterialTheme.colorScheme.primary else Color(0xFFE0E0E0)
     val textColor = if (message.isUser) MaterialTheme.colorScheme.onPrimary else Color.Black
     Box(
