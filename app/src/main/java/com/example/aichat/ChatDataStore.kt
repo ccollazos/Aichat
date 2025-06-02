@@ -9,6 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
+import com.example.aichat.ChatMessage as ChatMessage1
 
 val Context.dataStore by preferencesDataStore(name = "chat_prefs")
 
@@ -22,7 +23,7 @@ data class SerializableChatMessage(
     val isUser: Boolean
 )
 
-suspend fun saveMessages(context: Context, messages: List<ChatMessage>) {
+suspend fun saveMessages(context: Context, messages: List<ChatMessage1>) {
     val serializableList = messages.map { SerializableChatMessage(it.text, it.isUser) }
     val json = Json.encodeToString(serializableList)
     context.dataStore.edit { prefs ->
@@ -30,12 +31,12 @@ suspend fun saveMessages(context: Context, messages: List<ChatMessage>) {
     }
 }
 
-suspend fun loadMessages(context: Context): List<ChatMessage> {
+suspend fun loadMessages(context: Context): List<ChatMessage1> {
     val prefs = context.dataStore.data.first()
     val json = prefs[ChatPrefsKeys.MESSAGES] ?: return emptyList()
     return try {
         val serializableList = Json.decodeFromString<List<SerializableChatMessage>>(json)
-        serializableList.map { ChatMessage(it.text, it.isUser) }
+        serializableList.map { ChatMessage1(it.text, it.isUser) }
     } catch (e: Exception) {
         emptyList()
     }
