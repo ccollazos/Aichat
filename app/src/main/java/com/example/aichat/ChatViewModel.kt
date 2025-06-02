@@ -1,6 +1,7 @@
 package com.example.aichat
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -20,7 +21,12 @@ class ChatViewModel(private val context: Context) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _messages.value = loadMessages(context)
+            try {
+                _messages.value = loadMessages(context)
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "Error loading messages", e)
+                _messages.value = emptyList()
+            }
         }
     }
 
@@ -46,7 +52,11 @@ class ChatViewModel(private val context: Context) : ViewModel() {
 
     private fun save() {
         viewModelScope.launch {
-            saveMessages(context, _messages.value)
+            try {
+                saveMessages(context, _messages.value)
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "Error saving messages", e)
+            }
         }
     }
 
