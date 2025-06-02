@@ -2,6 +2,8 @@ package com.example.aichat
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,9 +20,14 @@ data class ChatMessage(
     val isUser: Boolean
 )
 
-class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
+@SuppressLint("ParcelCreator")
+class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel(),
+    Parcelable {
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
+
+    constructor(parcel: Parcel) : this(TODO("context")) {
+    }
 
     init {
         viewModelScope.launch {
@@ -62,5 +69,23 @@ class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Contex
                     return ChatViewModel(context.applicationContext) as T
                 }
             }
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ChatViewModel> {
+        override fun createFromParcel(parcel: Parcel): ChatViewModel {
+            return ChatViewModel(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ChatViewModel?> {
+            return arrayOfNulls(size)
+        }
     }
 } 
