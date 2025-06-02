@@ -1,15 +1,17 @@
 package com.example.aichat
 
-import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlin.text.Typography.dagger
 
 @Suppress("PLUGIN_IS_NOT_ENABLED")
 @Serializable
@@ -18,13 +20,16 @@ data class ChatMessage(
     val isUser: Boolean
 )
 
-class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val app: Application
+) : ViewModel() {
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _messages.value = loadMessages(context)
+            _messages.value = loadMessages(app)
         }
     }
 
@@ -41,7 +46,7 @@ class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Contex
     }
 
     private suspend fun simulateAIResponse(userMessage: String) {
-        kotlinx.coroutines.delay(1000)
+        delay(1000)
         val currentMessages = _messages.value.toMutableList()
         currentMessages.add(ChatMessage("Respuesta IA: $userMessage", false))
         _messages.value = currentMessages
@@ -50,17 +55,7 @@ class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Contex
 
     private fun save() {
         viewModelScope.launch {
-            saveMessages(context, _messages.value)
+            saveMessages(app, _messages.value)
         }
-    }
-
-    companion object {
-        fun provideFactory(context: Context): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    @Suppress("UNCHECKED_CAST")
-                    return ChatViewModel(context.applicationContext) as T
-                }
-            }
     }
 } 

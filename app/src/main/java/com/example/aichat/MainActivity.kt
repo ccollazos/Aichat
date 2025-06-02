@@ -44,9 +44,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +63,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen() {
-    val context = LocalContext.current
-    val viewModel: ChatViewModel = viewModel(factory = ChatViewModel.provideFactory(context))
+    val viewModel: ChatViewModel = hiltViewModel()
     var messageText by remember { mutableStateOf("") }
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
