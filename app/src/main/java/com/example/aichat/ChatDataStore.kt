@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
 
 val Context.dataStore by preferencesDataStore(name = "chat_prefs")
 
@@ -16,15 +15,12 @@ object ChatPrefsKeys {
     val MESSAGES = stringPreferencesKey("messages")
 }
 
-@Serializable
-data class SerializableChatMessage(
-    val text: String,
-    val isUser: Boolean
-)
-
 suspend fun saveMessages(context: Context, messages: List<ChatMessage>) {
-    val serializableList = messages.map { SerializableChatMessage(it.text, it.isUser) }
-    val json = Json.encodeToString(serializableList)
+    val json = try {
+        Json.encodeToString(messages)
+    } catch (e: Exception) {
+        "[]"
+    }
     context.dataStore.edit { prefs ->
         prefs[ChatPrefsKeys.MESSAGES] = json
     }
@@ -34,8 +30,7 @@ suspend fun loadMessages(context: Context): List<ChatMessage> {
     val prefs = context.dataStore.data.first()
     val json = prefs[ChatPrefsKeys.MESSAGES] ?: return emptyList()
     return try {
-        val serializableList = Json.decodeFromString<List<SerializableChatMessage>>(json)
-        serializableList.map { ChatMessage(it.text, it.isUser) }
+        Json.decodeFromString(json)
     } catch (e: Exception) {
         emptyList()
     }
