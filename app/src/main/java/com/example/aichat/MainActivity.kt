@@ -11,10 +11,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +38,9 @@ class MainActivity : ComponentActivity() {
 @JvmOverloads
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(
-    viewModel: ChatViewModel = viewModel()
-) {
+fun ChatScreen() {
+    val context = LocalContext.current
+    val viewModel: ChatViewModel = viewModel(factory = ChatViewModel.provideFactory(context))
     var messageText by remember { mutableStateOf("") }
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
@@ -80,13 +88,47 @@ fun ChatScreen(
                     .padding(16.dp)
             ) {
                 items(messages.size) { index ->
-                    Text(
-                        text = messages[index],
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
+                    val message = messages[index]
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
+                    ) {
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn() + slideInHorizontally(
+                                initialOffsetX = { fullWidth ->
+                                    if (message.isUser) fullWidth else -fullWidth
+                                }
+                            )
+                        ) {
+                            ChatBubble(message)
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ChatBubble(message: ChatMessage) {
+    val bubbleColor = if (message.isUser) MaterialTheme.colorScheme.primary else Color(0xFFE0E0E0)
+    val textColor = if (message.isUser) MaterialTheme.colorScheme.onPrimary else Color.Black
+    Box(
+        modifier = Modifier
+            .background(
+                color = bubbleColor,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .widthIn(max = 280.dp)
+    ) {
+        Text(
+            text = message.text,
+            color = textColor,
+            fontSize = 16.sp,
+            textAlign = if (message.isUser) TextAlign.End else TextAlign.Start
+        )
     }
 }
 
