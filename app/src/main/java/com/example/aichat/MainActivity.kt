@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import com.example.aichat.ChatList
+import com.example.aichat.EmptyChat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,30 +105,10 @@ fun ChatScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                items(messages.size) { index ->
-                    val message = messages[index]
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
-                    ) {
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + slideInHorizontally(
-                                initialOffsetX = { fullWidth ->
-                                    if (message.isUser) fullWidth else -fullWidth
-                                }
-                            )
-                        ) {
-                            ChatBubble(message)
-                        }
-                    }
-                }
+            if (messages.isEmpty()) {
+                EmptyChat()
+            } else {
+                ChatList(messages = messages, listState = listState)
             }
         }
     }

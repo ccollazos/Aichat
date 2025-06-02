@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-data class ChatMessage(
+data class Ch atMessage(
     val text: String,
     val isUser: Boolean
 )
