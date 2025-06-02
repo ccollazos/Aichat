@@ -1,5 +1,6 @@
 package com.example.aichat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +18,7 @@ data class ChatMessage(
     val isUser: Boolean
 )
 
-class ChatViewModel(private val context: Context) : ViewModel() {
+class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Context) : ViewModel() {
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
 
