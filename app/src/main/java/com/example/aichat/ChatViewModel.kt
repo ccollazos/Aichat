@@ -26,7 +26,7 @@ class ChatViewModel(@SuppressLint("StaticFieldLeak") private val context: Contex
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
 
-    constructor(parcel: Parcel) : this(TODO("context")) {
+    private constructor(parcel: Parcel) : this(TODO("context")) {
     }
 
     init {
