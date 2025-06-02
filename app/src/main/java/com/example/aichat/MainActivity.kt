@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
@@ -11,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +35,17 @@ fun ChatScreen(
 ) {
     var messageText by remember { mutableStateOf("") }
     val messages by viewModel.messages.collectAsState()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    // Scroll automático al enviar un mensaje
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(messages.size - 1)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -53,21 +68,20 @@ fun ChatScreen(
             )
         }
     ) { paddingValues ->
-        // Aquí irá la lista de mensajes en el futuro
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Por ahora solo mostraremos los mensajes en una columna simple
-            Column(
+            LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                messages.forEach { message ->
+                items(messages.size) { index ->
                     Text(
-                        text = message,
+                        text = messages[index],
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
