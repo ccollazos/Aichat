@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@JvmOverloads
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen() {
