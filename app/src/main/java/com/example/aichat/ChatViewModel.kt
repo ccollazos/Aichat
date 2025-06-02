@@ -1,7 +1,6 @@
 package com.example.aichat
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,8 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
-data class Ch atMessage(
+@Serializable
+data class ChatMessage(
     val text: String,
     val isUser: Boolean
 )
@@ -21,12 +22,7 @@ class ChatViewModel(private val context: Context) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            try {
-                _messages.value = loadMessages(context)
-            } catch (e: Exception) {
-                Log.e("ChatViewModel", "Error loading messages", e)
-                _messages.value = emptyList()
-            }
+            _messages.value = loadMessages(context)
         }
     }
 
@@ -52,11 +48,7 @@ class ChatViewModel(private val context: Context) : ViewModel() {
 
     private fun save() {
         viewModelScope.launch {
-            try {
-                saveMessages(context, _messages.value)
-            } catch (e: Exception) {
-                Log.e("ChatViewModel", "Error saving messages", e)
-            }
+            saveMessages(context, _messages.value)
         }
     }
 
